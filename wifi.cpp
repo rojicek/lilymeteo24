@@ -1,3 +1,4 @@
+#include <WiFi.h>
 
 const char* wifi_ap = "R_host";
 const char* wifi_pd = "badenka5";
@@ -17,11 +18,11 @@ int wifi_connect() {
     max_tries--;
     if (max_tries < 0) {
       Serial.println("wifi failed, giving up");
-      return false;
+      return 1;
     }
   }
   Serial.println("wifi ok");
-  return true;
+  return 0;
 }
 
 void wifi_disconnect() {

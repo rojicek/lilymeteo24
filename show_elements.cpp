@@ -3,16 +3,17 @@
 
 extern TTGOClass* ttgo;
 
-void show_clock(String shown_time, String actual_time) {
-
-  if (shown_time != actual_time) {
-    ttgo->tft->loadFont(ubuntu_regular_30);
+void show_text(int x, int y, const unsigned char* font, String shown, String actual)
+{
+  if (shown != actual)
+  {
+    ttgo->tft->loadFont(font);
     ttgo->tft->setTextColor(TFT_WHITE);
-    ttgo->tft->setCursor(280, 10);
-    ttgo->tft->print(shown_time);
+    ttgo->tft->setCursor(x, y);
+    ttgo->tft->print(shown);
     ttgo->tft->setTextColor(TFT_BLACK);
-    ttgo->tft->setCursor(280, 10);
-    ttgo->tft->print(actual_time);
+    ttgo->tft->setCursor(x, y);
+    ttgo->tft->print(actual);
   }
   return;
 }

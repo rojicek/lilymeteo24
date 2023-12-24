@@ -4,6 +4,7 @@
 #include "support.h"
 
 extern SPIClass* sdhander;
+//extern ESP32Time board_time(0); 
 
 int sdcard_begin() {
 
@@ -19,4 +20,35 @@ int sdcard_begin() {
   }
 
   return 0;
+}
+
+
+// Function that gets current epoch time
+void sync_local_clock() {
+  
+  const char *ntpServer = "pool.ntp.org";
+  const long gmtOffset_sec = 3600;
+  const int daylightOffset_sec = 3600;
+
+  ESP32Time board_time(0); 
+
+  //sync with NTP
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+
+  time_t now;
+  struct tm timeinfo;
+  int count = 10;  //how many tries
+  while (count > 0) {
+    if (getLocalTime(&timeinfo)) {
+      count = -1;
+    } else {
+      count--;  //try again
+      Serial.print("T");
+    }
+  }
+  time(&now);
+
+  board_time.setTime(now);
+  
+  return;
 }

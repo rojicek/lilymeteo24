@@ -17,11 +17,11 @@ int wifi_connect() {
     Serial.print(".");
     max_tries--;
     if (max_tries < 0) {
-      Serial.println("wifi failed, giving up");
+      Serial.println(" failed, giving up");
       return 1;
     }
   }
-  Serial.println("wifi ok");
+  Serial.println(" ok");
   return 0;
 }
 

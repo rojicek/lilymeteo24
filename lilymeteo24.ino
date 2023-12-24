@@ -14,7 +14,7 @@ SPIClass* sdhander = nullptr;
 #include "wifi.h"
 #include "show_elements.h"
 
-#include "ubuntu_fonts.h"
+
 
 TTGOClass* ttgo;
 
@@ -107,10 +107,8 @@ if (do_anything == 1) {
 String actual_time = board_time.getTime("%e %b, %R");
 
 // kresli na displej
-  ttgo->tft->loadFont(ubuntu_regular_30);
-  ttgo->tft->setTextColor(TFT_BLACK);
-  ttgo->tft->setCursor(280, 10);
-  ttgo->tft->print(actual_time);
+  show_clock(shown_time, actual_time);
+  shown_time = actual_time;
 
 
 // blbosti

@@ -4,6 +4,6 @@
 
 #include "config.h"
 
-void show_clock();
+void show_clock(String shown_time, String actual_time);
 
 #endif

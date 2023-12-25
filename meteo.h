@@ -8,6 +8,7 @@ struct meteo_data{
   int oat;
   char sunrise[6];
   char sunset[6];
+  int sunlight;
 };
 
 meteo_data update_meteo();

@@ -1,8 +1,11 @@
 #include <WiFi.h>
 
-const char* wifi_ap = "R_host";
-const char* wifi_pd = "badenka5";
+//const char* wifi_ap = "R_host";
+//const char* wifi_pd = "badenka5";
 
+
+const char* wifi_ap = "RFM2";
+const char* wifi_pd = "ada3022001";
 
 ///////////////////////
 int wifi_connect() {
@@ -21,7 +24,7 @@ int wifi_connect() {
       return 1;
     }
   }
-  Serial.println(" ok");
+  Serial.println(".ok!");
   return 0;
 }
 

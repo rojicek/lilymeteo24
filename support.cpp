@@ -4,7 +4,6 @@
 #include "support.h"
 
 extern SPIClass* sdhander;
-//extern ESP32Time board_time(0); 
 
 int sdcard_begin() {
 
@@ -41,9 +40,11 @@ void sync_local_clock() {
   while (count > 0) {
     if (getLocalTime(&timeinfo)) {
       count = -1;
+      Serial.println("NTP time syncd");
     } else {
       count--;  //try again
-      Serial.print("T");
+      Serial.println("NTP time failed");
+      delay(500);
     }
   }
   time(&now);
@@ -52,3 +53,4 @@ void sync_local_clock() {
   
   return;
 }
+

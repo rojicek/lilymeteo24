@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 #include <TimeLib.h>
 #include <Time.h>
+#include <ESP32Time.h>
 
 
 
@@ -14,12 +15,10 @@ meteo_data update_meteo() {
   HTTPClient http;
   String url = "https://www.rojicek.cz/meteo/meteo-query.php?pwd=pa1e2";
 
-  Serial.println("updating meteo 1");
   http.begin(url.c_str());
-  Serial.println("updating meteo 2");
 
   int httpResponseCode = http.GET();
-  Serial.println("updating meteo 3");
+
 
   if (httpResponseCode == 200) {
     String payload = http.getString();
@@ -38,6 +37,7 @@ meteo_data update_meteo() {
     struct tm sunrise_local = *localtime(&sunrise);
     strftime(md.sunrise, sizeof(md.sunrise), "%H:%M", &sunrise_local);
 
+    // odstran nulu na pocatku vychodu slunce. if je zbytecne, ale radeji jo
     if (md.sunrise[0] == '0')
       memmove(md.sunrise, md.sunrise + 1, strlen(md.sunrise));
 
@@ -45,10 +45,18 @@ meteo_data update_meteo() {
     struct tm sunset_local = *localtime(&sunset);
     strftime(md.sunset, sizeof(md.sunset), "%H:%M", &sunset_local);
 
+    // decide if its day or night
+    ESP32Time board_time(0);
+    unsigned long current_epoch = board_time.getEpoch();
+    if ((current_epoch > w_doc["weather"]["sunrise"]) && (current_epoch < w_doc["weather"]["sunset"]))
+      md.sunlight = 1;
+    else
+      md.sunlight = 0;
+
 
     md.valid = true;
   }
 
-
+  Serial.println("meteo updated");
   return md;
 }

@@ -202,10 +202,12 @@ void loop() {
           drawPic(ICON_TREND_x, ICON_TREND_y, ICON_TREND_width, ICON_TREND_height, full_path_trend_icon);   
 
 
-          show_text(250, 250, 50, ubuntu_regular_30, "x", "now");
-          show_text(360, 360, 50, ubuntu_regular_30, "x", "thu");
-          drawPic(260, 110, 75, 75, "/cycle_2.raw");
-          drawPic(360, 110, 75, 75, "/cycle_2.raw");
+          show_text(280, 280, 80, ubuntu_regular_23, "x", "now");
+          String zitra = String(board_time.getTime("%a"));
+          zitra.toLowerCase();
+          show_text(390, 390, 80, ubuntu_regular_23, "x",zitra);
+          drawPic(260, 105, 75, 75, "/cycle_2.raw");
+          drawPic(370, 105, 75, 75, "/cycle_2.raw");
 
 
           Serial.println(shown_oat);

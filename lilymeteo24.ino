@@ -4,6 +4,7 @@
 #include <SD.h>
 #include <SPI.h>
 #include <ESP32Time.h>
+#include <TimeLib.h>
 
 SPIClass* sdhander = nullptr;
 
@@ -21,7 +22,7 @@ TTGOClass* ttgo;
 // jak casto sync hodiny s ntp ()
 #define SYNC_CLOCK_SEC 60
 // jak casto se nacte meteo (15min)
-#define QUICK_LOOP_SEC 60
+#define QUICK_LOOP_SEC 120
 
 #define TXT_TIME_x 280
 #define TXT_TIME_y 10
@@ -59,7 +60,11 @@ String shown_sunrise("XX");
 String shown_sunset("XX");
 String shown_oat("XX");
 String shown_trend_temp("XX");
+String shown_tomorrow("XX");
+String shown_today("xx");
 int shown_past_shift_x = 0;
+
+String day_of_week[7] = { "sun", "mon", "tue", "wed", "thu", "fri", "sat"};
 
 
 
@@ -200,15 +205,30 @@ void loop() {
           //prekreslim pokazde - je to jedno
           String full_path_trend_icon = "/meteo/trend/" + String(md.trend_icon) + "_40.raw";
           drawPic(ICON_TREND_x, ICON_TREND_y, ICON_TREND_width, ICON_TREND_height, full_path_trend_icon);   
+     
+          int dneskaDoW = board_time.getDayofWeek();
+          int zitraDoW = dneskaDoW + 1;
+          if (zitraDoW>6)
+            zitraDoW = zitraDoW-7;
 
+          String dneska = day_of_week[dneskaDoW];
+          String zitra = day_of_week[zitraDoW];
+          
 
-          show_text(280, 280, 80, ubuntu_regular_23, "x", "now");
-          String zitra = String(board_time.getTime("%a"));
-          zitra.toLowerCase();
-          show_text(390, 390, 80, ubuntu_regular_23, "x",zitra);
-          drawPic(260, 105, 75, 75, "/cycle_2.raw");
-          drawPic(370, 105, 75, 75, "/cycle_2.raw");
+          show_text(280, 280, 80, ubuntu_regular_23, shown_today, dneska);
+          show_text(390, 390, 80, ubuntu_regular_23, shown_tomorrow, zitra);
+          shown_today = dneska;
+          shown_tomorrow = zitra;
 
+          // prekreslin pokazde
+          drawPic(260, 105, 75, 75,"/meteo/cycle/cycle_" + String(md.clc_tdy) + "_40.raw");
+          drawPic(370, 105, 75, 75,"/meteo/cycle/cycle_" + String(md.clc_tmr) + "_40.raw");
+
+          //drawPic(260, 215, 50, 50, "/air1A.raw");
+          drawPic(260, 215, 55, 53, "/meteo/air/air" + String(md.aqi) + "_55.raw");
+         // d:\meteo\air\air1_55.raw 
+
+          show_text(330, 330, 237, ubuntu_regular_30, "xx", "+5h, +7h");  
 
           Serial.println(shown_oat);
           Serial.print("Sunrise:");

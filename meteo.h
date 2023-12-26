@@ -13,6 +13,11 @@ struct meteo_data{
   char w_icon[4];
   char trend_icon[20];
   int trend_temp;
+
+  int clc_tdy;
+  int clc_tmr;
+
+  char aqi[5];
 };
 
 meteo_data update_meteo();

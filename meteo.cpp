@@ -63,9 +63,14 @@ meteo_data update_meteo() {
     strcpy(md.w_icon, w_doc["weather"]["w_icon"]);
     strcpy(md.trend_icon, w_doc["weather"]["temp_trend_icon"]);
 
-
     md.trend_temp = w_doc["weather"]["temp_trend"];
 
+    md.clc_tdy = w_doc["weather"]["clc_tdy"];
+    md.clc_tmr = w_doc["weather"]["clc_tmr"];
+
+    strcpy (md.aqi, w_doc["weather"]["aqi"]);
+    
+  
     md.valid = true;
   }
 

@@ -9,11 +9,11 @@
 
 extern TTGOClass* ttgo;
 
-void show_text(int x, int y, const unsigned char* font, String shown, String actual) {
+void show_text(int past_x, int x, int y, const unsigned char* font, String shown, String actual) {
   if (shown != actual) {
     ttgo->tft->loadFont(font);
     ttgo->tft->setTextColor(TFT_WHITE);
-    ttgo->tft->setCursor(x, y);
+    ttgo->tft->setCursor(past_x, y);
     ttgo->tft->print(shown);
     ttgo->tft->setTextColor(TFT_BLACK);
     ttgo->tft->setCursor(x, y);
@@ -27,9 +27,9 @@ void show_text(int x, int y, const unsigned char* font, String shown, String act
 void drawPic(int x, int y, int dimx, int dimy, String pic) {
 
   File picFile = SD.open(pic);
-  Serial.print("soubor handler:>");
-  Serial.print(picFile);
-  Serial.println("<<<");
+  //Serial.print("soubor handler:>");
+  //Serial.print(picFile);
+  //Serial.println("<<<");
 
 
   if (picFile == 1) {
@@ -55,7 +55,7 @@ void drawPic(int x, int y, int dimx, int dimy, String pic) {
   } else {
     Serial.print(pic);
     Serial.println(".. not found");
-    
+
     for (int i = x; i < x + dimx; i++) {
       for (int j = y; j < y + dimy; j++) {
 

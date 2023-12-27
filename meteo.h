@@ -18,6 +18,10 @@ struct meteo_data{
   int clc_tmr;
 
   char aqi[5];
+
+  int hdo1;
+  int hdo2;
+
 };
 
 meteo_data update_meteo();

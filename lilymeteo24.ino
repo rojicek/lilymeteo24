@@ -1,4 +1,4 @@
-//http://www.rinkydinkelectronics.com/t_imageconverter565.php 
+//http://www.rinkydinkelectronics.com/t_imageconverter565.php
 
 
 #include <SD.h>
@@ -22,7 +22,7 @@ TTGOClass* ttgo;
 // jak casto sync hodiny s ntp ()
 #define SYNC_CLOCK_SEC 60
 // jak casto se nacte meteo (15min)
-#define QUICK_LOOP_SEC 120
+#define QUICK_LOOP_SEC 60
 
 #define TXT_TIME_x 280
 #define TXT_TIME_y 10
@@ -62,9 +62,10 @@ String shown_oat("XX");
 String shown_trend_temp("XX");
 String shown_tomorrow("XX");
 String shown_today("xx");
+String shown_hdo("xx");
 int shown_past_shift_x = 0;
 
-String day_of_week[7] = { "sun", "mon", "tue", "wed", "thu", "fri", "sat"};
+String day_of_week[7] = { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
 
 
 
@@ -85,18 +86,16 @@ void setup() {
   ttgo->tft->setRotation(3);
   ttgo->tft->fillScreen(TFT_SKYBLUE);
 
- // strcpy(shown_oat, "xx");
- // strcpy(shown_trend_temp, "xx");
- 
+  // strcpy(shown_oat, "xx");
+  // strcpy(shown_trend_temp, "xx");
+
   //SD karta
   if (sdcard_begin()) {
     Serial.println("sd ok");
+  } else {
+    Serial.println("sd failed");
   }
-  else
-  {
-     Serial.println("sd failed");
-  }
-  
+
 
   delay(5000);
   ttgo->tft->fillScreen(TFT_WHITE);
@@ -104,7 +103,15 @@ void setup() {
 }
 
 void loop() {
-  
+
+  ////////////////////
+  /*
+  ttgo->tft->fillScreen(TFT_WHITE);
+  delay(10000);
+  ttgo->tft->fillScreen(TFT_BLACK);
+  delay(10000);
+*/
+
 
   int do_anything = 0;
   int do_sync_clock = 0;
@@ -180,9 +187,9 @@ void loop() {
           drawPic(ICON_WEATHER_x, ICON_WEATHER_y, ICON_WEATHER_width, ICON_WEATHER_height, w_icon_path);
 
 
-          String actual_oat("");  
+          String actual_oat("");
           actual_oat = (String)md.oat + "°C";
-         // sprintf(actual_oat, "%d°C", md.oat);
+          // sprintf(actual_oat, "%d°C", md.oat);
           int x_shift = 0;
           if (md.oat <= -10)
             x_shift = -10;
@@ -191,29 +198,29 @@ void loop() {
           // pod -10 : -10px
           // -10 .. 0: default
           // 0 .. 10: +15px
-          // nad +10: default  
+          // nad +10: default
 
-          show_text(TXT_OAT_x+shown_past_shift_x, TXT_OAT_x+x_shift, TXT_OAT_y, ubuntu_bold_45, shown_oat, actual_oat);
+          show_text(TXT_OAT_x + shown_past_shift_x, TXT_OAT_x + x_shift, TXT_OAT_y, ubuntu_bold_45, shown_oat, actual_oat);
           shown_oat = actual_oat;
           shown_past_shift_x = x_shift;
 
-          String actual_trend_temp("");  
+          String actual_trend_temp("");
           actual_trend_temp = String(md.trend_temp) + "°C";
           show_text(TXT_TREND_TEMP_x, TXT_TREND_TEMP_x, TXT_TREND_TEMP_y, ubuntu_regular_30, shown_trend_temp, actual_trend_temp);
           shown_trend_temp = actual_trend_temp;
 
           //prekreslim pokazde - je to jedno
           String full_path_trend_icon = "/meteo/trend/" + String(md.trend_icon) + "_40.raw";
-          drawPic(ICON_TREND_x, ICON_TREND_y, ICON_TREND_width, ICON_TREND_height, full_path_trend_icon);   
-     
+          drawPic(ICON_TREND_x, ICON_TREND_y, ICON_TREND_width, ICON_TREND_height, full_path_trend_icon);
+
           int dneskaDoW = board_time.getDayofWeek();
           int zitraDoW = dneskaDoW + 1;
-          if (zitraDoW>6)
-            zitraDoW = zitraDoW-7;
+          if (zitraDoW > 6)
+            zitraDoW = zitraDoW - 7;
 
           String dneska = day_of_week[dneskaDoW];
           String zitra = day_of_week[zitraDoW];
-          
+
 
           show_text(280, 280, 80, ubuntu_regular_23, shown_today, dneska);
           show_text(390, 390, 80, ubuntu_regular_23, shown_tomorrow, zitra);
@@ -221,14 +228,22 @@ void loop() {
           shown_tomorrow = zitra;
 
           // prekreslin pokazde
-          drawPic(260, 105, 75, 75,"/meteo/cycle/cycle_" + String(md.clc_tdy) + "_40.raw");
-          drawPic(370, 105, 75, 75,"/meteo/cycle/cycle_" + String(md.clc_tmr) + "_40.raw");
+          drawPic(260, 105, 75, 75, "/meteo/cycle/cycle_" + String(md.clc_tdy) + "_40.raw");
+          drawPic(370, 105, 75, 75, "/meteo/cycle/cycle_" + String(md.clc_tmr) + "_40.raw");
 
           //drawPic(260, 215, 50, 50, "/air1A.raw");
-          drawPic(260, 215, 55, 53, "/meteo/air/air" + String(md.aqi) + "_55.raw");
-         // d:\meteo\air\air1_55.raw 
+          drawPic(260, 225, 55, 53, "/meteo/air/air" + String(md.aqi) + "_55.raw");
+          // d:\meteo\air\air1_55.raw
 
-          show_text(330, 330, 237, ubuntu_regular_30, "xx", "+5h, +7h");  
+          String actual_hdo("");
+          if (md.hdo1 == 0)
+            actual_hdo = "now, ";
+          else
+            actual_hdo = "+" + String(md.hdo1) + "h, ";
+          actual_hdo = actual_hdo + "+" + String(md.hdo2) + "h";
+
+          show_text(330, 330, 236, ubuntu_regular_30, shown_hdo, actual_hdo);
+          shown_hdo = actual_hdo;
 
           Serial.println(shown_oat);
           Serial.print("Sunrise:");

@@ -6,6 +6,30 @@
 #include <Time.h>
 #include <ESP32Time.h>
 
+#define DELKA_PROGRAMU 90000  // sekundy
+
+int kolik_je_prunik(unsigned long start1, unsigned long end1, unsigned long start2, unsigned long end2) {
+  if (start1 > start2) {
+    //prohodit
+    unsigned long tmp = start1;
+    start1 = start2;
+    start2 = tmp;
+
+    tmp = end1;
+    end1 = end2;
+    end2 = tmp;
+  }
+
+  // ted vim, ze start1 je prvni
+  if (start2 >= end1)
+    return 0;
+  else {
+    if (end2 <= end1)  // druhy je cely v prvnim
+      return end2 - start2;
+    else
+      return end2 - start1;
+  }
+}
 
 
 meteo_data update_meteo() {
@@ -59,7 +83,7 @@ meteo_data update_meteo() {
       md.sunlight = 1;
     else
       md.sunlight = 0;
-  
+
     strcpy(md.w_icon, w_doc["weather"]["w_icon"]);
     strcpy(md.trend_icon, w_doc["weather"]["temp_trend_icon"]);
 
@@ -68,13 +92,43 @@ meteo_data update_meteo() {
     md.clc_tdy = w_doc["weather"]["clc_tdy"];
     md.clc_tmr = w_doc["weather"]["clc_tmr"];
 
-    strcpy (md.aqi, w_doc["weather"]["aqi"]);
-    
-  
+    strcpy(md.aqi, w_doc["weather"]["aqi"]);
+
+    //get hdo info
+    md.hdo1 = 4;
+    md.hdo2 = 6;
+
+    JsonArray hdo_arr = w_doc["hdo_intervals"].as<JsonArray>();
+    // uz mam current_epoch
+    // smycka pro hodiny, ktere testuji
+
+    //  Serial.println(hdo_arr[0][0]);
+    //  Serial.print("*->");
+
+    for (int hour = 0; hour < 12; hour++) {
+      unsigned long one_start = current_epoch + hour * 3600;
+      unsigned long one_end = DELKA_PROGRAMU + one_start;
+
+      int ve_drahe_sazbe = 0;
+
+
+      for (JsonVariant value : hdo_arr) {
+
+        ve_drahe_sazbe += kolik_je_prunik(one_start, one_end, value[0].as<const int>(), value[1].as<const int>());
+      }
+      Serial.print("start v +");
+      Serial.print(hour);
+      Serial.print(" = ");
+      Serial.print(ve_drahe_sazbe);
+      Serial.println(" min");
+    }
+
+    Serial.println("<<<array");
+
+
     md.valid = true;
   }
 
   Serial.println("meteo updated");
   return md;
-
 }

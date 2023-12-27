@@ -27,7 +27,7 @@ int kolik_je_prunik(unsigned long start1, unsigned long end1, unsigned long star
     if (end2 <= end1)  // druhy je cely v prvnim
       return end2 - start2;
     else
-      return end2 - start1;
+      return end1 - start2;
   }
 }
 
@@ -118,8 +118,8 @@ meteo_data update_meteo() {
       }
       Serial.print("start v +");
       Serial.print(hour);
-      Serial.print(" = ");
-      Serial.print(ve_drahe_sazbe);
+      Serial.print("h = ");
+      Serial.print(ve_drahe_sazbe/60.0);
       Serial.println(" min");
     }
 

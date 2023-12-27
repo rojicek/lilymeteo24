@@ -6,7 +6,7 @@
 #include <Time.h>
 #include <ESP32Time.h>
 
-#define DELKA_PROGRAMU 90000  // sekundy
+#define DELKA_PROGRAMU 9000  // sekundy
 
 int kolik_je_prunik(unsigned long start1, unsigned long end1, unsigned long start2, unsigned long end2) {
   if (start1 > start2) {

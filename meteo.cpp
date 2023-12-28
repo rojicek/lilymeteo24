@@ -7,6 +7,7 @@
 #include <ESP32Time.h>
 
 #define DELKA_PROGRAMU 9000  // sekundy
+#define RANNI_HDO_HODINA 8   // druhe hdo chci co nejblize tolika hodin rano (konec programu)
 
 int kolik_je_prunik(unsigned long start1, unsigned long end1, unsigned long start2, unsigned long end2) {
   if (start1 > start2) {
@@ -95,8 +96,8 @@ meteo_data update_meteo() {
     strcpy(md.aqi, w_doc["weather"]["aqi"]);
 
     //get hdo info
-    md.hdo1 = 4;
-    md.hdo2 = 6;
+    md.hdo1 = -1;
+    md.hdo2 = -1;
 
     JsonArray hdo_arr = w_doc["hdo_intervals"].as<JsonArray>();
     // uz mam current_epoch
@@ -105,22 +106,73 @@ meteo_data update_meteo() {
     //  Serial.println(hdo_arr[0][0]);
     //  Serial.print("*->");
 
-    for (int hour = 0; hour < 12; hour++) {
-      unsigned long one_start = current_epoch + hour * 3600;
-      unsigned long one_end = DELKA_PROGRAMU + one_start;
+    struct tm ranni_hdo;
+    time_t ranni_hdo_seconds = current_epoch + 86400;
+    ;
+    memcpy(&ranni_hdo, localtime(&ranni_hdo_seconds), sizeof(struct tm));
+    ranni_hdo.tm_hour = RANNI_HDO_HODINA;
+    ranni_hdo.tm_min = 0;
+    ranni_hdo.tm_sec = 0;
+
+    unsigned long ranni_hdo_epoch = mktime(&ranni_hdo);
+    unsigned long time_from_ranni_hdo = 999999999;
+
+
+    for (int one_hour = 0; one_hour < 24; one_hour++) {
+
+      Serial.println("----------------------------------");
+      Serial.print("one hour:");
+      Serial.println(one_hour);
+
+      unsigned long one_start_epoch = current_epoch + one_hour * 3600;
+      unsigned long one_end_epoch = DELKA_PROGRAMU + one_start_epoch;
 
       int ve_drahe_sazbe = 0;
+      int prev_hdo2_ok = 0;
 
 
       for (JsonVariant value : hdo_arr) {
-
-        ve_drahe_sazbe += kolik_je_prunik(one_start, one_end, value[0].as<const int>(), value[1].as<const int>());
+        ve_drahe_sazbe += kolik_je_prunik(one_start_epoch, one_end_epoch, value[0].as<const int>(), value[1].as<const int>());
       }
-      Serial.print("start v +");
-      Serial.print(hour);
-      Serial.print("h = ");
-      Serial.print(ve_drahe_sazbe/60.0);
-      Serial.println(" min");
+
+
+      if ((float)ve_drahe_sazbe / (float)DELKA_PROGRAMU < 0.03) {
+        // tahle hodina je ok pro prani (mene nez 3 procenta)
+        if (md.hdo1 == -1) {
+          // prvni vezmu do hdo1
+          md.hdo1 = one_hour;
+        }
+
+
+        if (md.hdo2 == -1) {
+          long hdo2_time_diff = (long)(one_end_epoch - ranni_hdo_epoch);
+          if (hdo2_time_diff < 0)
+            hdo2_time_diff = -hdo2_time_diff;  //abs
+
+
+          Serial.print("HDO diff:");
+          Serial.print(one_hour);
+          Serial.print(":");
+          Serial.print(hdo2_time_diff);
+          Serial.print("(");
+          Serial.print(time_from_ranni_hdo);
+          Serial.println(")");
+
+
+          if (hdo2_time_diff < time_from_ranni_hdo) {
+            time_from_ranni_hdo = hdo2_time_diff;
+          } else {
+            if (one_hour == 0) {
+              md.hdo2 = 0;
+            } else {
+              md.hdo2 = prev_hdo2_ok;
+            }
+          }
+        }
+        // zapisu si posledni hodinu, kdy muzu spustit program
+        prev_hdo2_ok = one_hour;
+      }
+
     }
 
     Serial.println("<<<array");

@@ -86,18 +86,20 @@ void setup() {
   ttgo->tft->setRotation(3);
   ttgo->tft->fillScreen(TFT_SKYBLUE);
 
-  // strcpy(shown_oat, "xx");
-  // strcpy(shown_trend_temp, "xx");
-
-  //SD karta
-  if (sdcard_begin()) {
-    Serial.println("sd ok");
-  } else {
-    Serial.println("sd failed");
+  int sd_count = 10;
+  Serial.print("sd:");
+  while ((sdcard_begin() == 0) && (sd_count > 0)) {
+    Serial.print(".");
+    sd_count--;
+    delay(1000);
   }
 
+  if (sd_count > 0)
+    Serial.println(" ok!");
+  else
+    Serial.println(" failed!");
 
-  delay(5000);
+  delay(1000);  // nevim proc
   ttgo->tft->fillScreen(TFT_WHITE);
   Serial.println("setup hotov");
 }
@@ -236,11 +238,19 @@ void loop() {
           // d:\meteo\air\air1_55.raw
 
           String actual_hdo("");
-          if (md.hdo1 == 0)
+          if (md.hdo1 < 0)
+            actual_hdo = "??, ";
+          else if (md.hdo1 == 0)
             actual_hdo = "now, ";
           else
             actual_hdo = "+" + String(md.hdo1) + "h, ";
-          actual_hdo = actual_hdo + "+" + String(md.hdo2) + "h";
+
+          if (md.hdo2 < 0)
+            actual_hdo = actual_hdo + "??";
+          else if (md.hdo2 == 0)
+            actual_hdo = actual_hdo + "now, ";
+          else
+            actual_hdo = actual_hdo + "+" + String(md.hdo2) + "h";
 
           show_text(330, 330, 236, ubuntu_regular_30, shown_hdo, actual_hdo);
           shown_hdo = actual_hdo;

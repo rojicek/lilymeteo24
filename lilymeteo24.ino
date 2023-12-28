@@ -227,7 +227,7 @@ void loop() {
 
 
           show_text(280, 280, 80, ubuntu_regular_23, shown_today, dneska);
-          show_text(390, 390, 80, ubuntu_regular_23, shown_tomorrow, zitra);
+          show_text(400, 400, 80, ubuntu_regular_23, shown_tomorrow, zitra);
           shown_today = dneska;
           shown_tomorrow = zitra;
 
@@ -272,5 +272,5 @@ void loop() {
   }
 
 
-  delay(10000);
+  delay(1000);
 }

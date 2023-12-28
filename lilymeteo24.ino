@@ -19,10 +19,10 @@ SPIClass* sdhander = nullptr;
 
 TTGOClass* ttgo;
 
-// jak casto sync hodiny s ntp ()
-#define SYNC_CLOCK_SEC 60
-// jak casto se nacte meteo (15min)
-#define QUICK_LOOP_SEC 60
+// jak casto sync hodiny s ntp (12 hodin)
+#define SYNC_CLOCK_SEC 43200
+// jak casto se nacte meteo (5 min)
+#define QUICK_LOOP_SEC 300
 
 #define TXT_TIME_x 280
 #define TXT_TIME_y 10
@@ -88,7 +88,7 @@ void setup() {
 
   int sd_count = 10;
   Serial.print("sd:");
-  while ((sdcard_begin() == 0) && (sd_count > 0)) {
+  while ((sdcard_begin() != 0) && (sd_count > 0)) {
     Serial.print(".");
     sd_count--;
     delay(1000);
@@ -153,6 +153,8 @@ void loop() {
   Serial.println(actual_time);
 
   if (do_anything == 1) {
+    drawBox(470, 310, 10, 10, TFT_RED);
+
     if (wifi_connect() == 0) {  //wifi ok
 
       if (do_sync_clock == 1) {
@@ -255,17 +257,18 @@ void loop() {
           show_text(330, 330, 236, ubuntu_regular_30, shown_hdo, actual_hdo);
           shown_hdo = actual_hdo;
 
-          Serial.println(shown_oat);
-          Serial.print("Sunrise:");
-          Serial.println(shown_sunrise);
-          Serial.print("Sunset:");
-          Serial.println(shown_sunset);
-          Serial.println(full_path_trend_icon);
+          //Serial.println(shown_oat);
+          //Serial.print("Sunrise:");
+          //Serial.println(shown_sunrise);
+          //Serial.print("Sunset:");
+          //Serial.println(shown_sunset);
+          //Serial.println(full_path_trend_icon);
         }
       }
 
       wifi_disconnect();
     }
+    drawBox(470, 310, 10, 10, TFT_WHITE);
   }
 
 

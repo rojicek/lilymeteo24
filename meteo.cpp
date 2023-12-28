@@ -63,8 +63,8 @@ meteo_data update_meteo() {
     struct tm sunrise_local = *localtime(&sunrise);
     strftime(md.sunrise, sizeof(md.sunrise), "%H:%M", &sunrise_local);
 
-    Serial.print("raw sunrise:");
-    Serial.println(sunrise);
+    //Serial.print("raw sunrise:");
+    //Serial.println(sunrise);
 
     // odstran nulu na pocatku vychodu slunce. if je zbytecne, ale radeji jo
     if (md.sunrise[0] == '0')
@@ -74,8 +74,8 @@ meteo_data update_meteo() {
     struct tm sunset_local = *localtime(&sunset);
     strftime(md.sunset, sizeof(md.sunset), "%H:%M", &sunset_local);
 
-    Serial.print("raw sunset:");
-    Serial.println(sunset);
+    //Serial.print("raw sunset:");
+    //Serial.println(sunset);
 
     // decide if its day or night
     ESP32Time board_time(0);
@@ -108,7 +108,7 @@ meteo_data update_meteo() {
 
     struct tm ranni_hdo;
     time_t ranni_hdo_seconds = current_epoch + 86400;
-    ;
+
     memcpy(&ranni_hdo, localtime(&ranni_hdo_seconds), sizeof(struct tm));
     ranni_hdo.tm_hour = RANNI_HDO_HODINA;
     ranni_hdo.tm_min = 0;
@@ -116,19 +116,20 @@ meteo_data update_meteo() {
 
     unsigned long ranni_hdo_epoch = mktime(&ranni_hdo);
     unsigned long time_from_ranni_hdo = 999999999;
+    int prev_hdo2_ok = 0;
 
 
     for (int one_hour = 0; one_hour < 24; one_hour++) {
 
-      Serial.println("----------------------------------");
-      Serial.print("one hour:");
-      Serial.println(one_hour);
+     // Serial.println("----------------------------------");
+     // Serial.print("one hour:");
+     // Serial.println(one_hour);
 
       unsigned long one_start_epoch = current_epoch + one_hour * 3600;
       unsigned long one_end_epoch = DELKA_PROGRAMU + one_start_epoch;
 
       int ve_drahe_sazbe = 0;
-      int prev_hdo2_ok = 0;
+
 
 
       for (JsonVariant value : hdo_arr) {
@@ -149,16 +150,6 @@ meteo_data update_meteo() {
           if (hdo2_time_diff < 0)
             hdo2_time_diff = -hdo2_time_diff;  //abs
 
-
-          Serial.print("HDO diff:");
-          Serial.print(one_hour);
-          Serial.print(":");
-          Serial.print(hdo2_time_diff);
-          Serial.print("(");
-          Serial.print(time_from_ranni_hdo);
-          Serial.println(")");
-
-
           if (hdo2_time_diff < time_from_ranni_hdo) {
             time_from_ranni_hdo = hdo2_time_diff;
           } else {
@@ -166,16 +157,18 @@ meteo_data update_meteo() {
               md.hdo2 = 0;
             } else {
               md.hdo2 = prev_hdo2_ok;
+             // Serial.print("beru:");
+             // Serial.println(prev_hdo2_ok);
             }
           }
         }
         // zapisu si posledni hodinu, kdy muzu spustit program
+        //Serial.println("zapisuji prev_hdo2_ok");
         prev_hdo2_ok = one_hour;
       }
-
     }
 
-    Serial.println("<<<array");
+    //Serial.println("<<<array");
 
 
     md.valid = true;

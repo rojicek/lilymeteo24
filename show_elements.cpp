@@ -50,8 +50,8 @@ void drawPic(int x, int y, int dimx, int dimy, String pic) {
 
     if (pbuffer) free(pbuffer);
 
-    Serial.print(pic);
-    Serial.println(".. ok!");
+    //Serial.print(pic);
+    //Serial.println(".. ok!");
   } else {
     Serial.print(pic);
     Serial.println(".. not found");

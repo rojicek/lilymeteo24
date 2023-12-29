@@ -137,7 +137,7 @@ meteo_data update_meteo() {
       }
 
 
-      if ((float)ve_drahe_sazbe / (float)DELKA_PROGRAMU < 0.03) {
+      if ((float)ve_drahe_sazbe / (float)DELKA_PROGRAMU < 0.05) {
         // tahle hodina je ok pro prani (mene nez 3 procenta)
         if (md.hdo1 < 0) {
           // prvni vezmu do hdo1

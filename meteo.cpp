@@ -7,7 +7,7 @@
 #include <ESP32Time.h>
 
 #define DELKA_PROGRAMU 9000  // sekundy
-#define RANNI_HDO_HODINA 8   // druhe hdo chci co nejblize tolika hodin rano (konec programu)
+#define RANNI_HDO_HODINA 9   // druhe hdo chci co nejblize tolika hodin rano (konec programu)
 
 int kolik_je_prunik(unsigned long start1, unsigned long end1, unsigned long start2, unsigned long end2) {
   if (start1 > start2) {
@@ -139,13 +139,13 @@ meteo_data update_meteo() {
 
       if ((float)ve_drahe_sazbe / (float)DELKA_PROGRAMU < 0.03) {
         // tahle hodina je ok pro prani (mene nez 3 procenta)
-        if (md.hdo1 == -1) {
+        if (md.hdo1 < 0) {
           // prvni vezmu do hdo1
           md.hdo1 = one_hour;
         }
 
 
-        if (md.hdo2 == -1) {
+        if (md.hdo2 < 0) {
           long hdo2_time_diff = (long)(one_end_epoch - ranni_hdo_epoch);
           if (hdo2_time_diff < 0)
             hdo2_time_diff = -hdo2_time_diff;  //abs
@@ -167,6 +167,10 @@ meteo_data update_meteo() {
         prev_hdo2_ok = one_hour;
       }
     }
+
+    //tohle tu nejak patri, ale uplne to promyslene nemam - pouzije se, kdyz je spravna ta posledni hodina
+    if (md.hdo2 < 0)
+       md.hdo2 = prev_hdo2_ok;
 
     //Serial.println("<<<array");
 

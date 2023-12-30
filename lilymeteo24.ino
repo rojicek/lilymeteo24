@@ -19,10 +19,10 @@ SPIClass* sdhander = nullptr;
 
 TTGOClass* ttgo;
 
-// jak casto sync hodiny s ntp (12 hodin)
-#define SYNC_CLOCK_SEC 43200
-// jak casto se nacte meteo (5 min)
-#define QUICK_LOOP_SEC 300
+// jak casto sync hodiny s ntp (12 hodin nebo tak nejak)
+#define SYNC_CLOCK_SEC 40000
+// jak casto se nacte meteo (3 min)
+#define QUICK_LOOP_SEC 180
 
 #define TXT_TIME_x 280
 #define TXT_TIME_y 10
@@ -122,7 +122,9 @@ void loop() {
   ESP32Time board_time(0);
   meteo_data md;
 
+
   unsigned long current_epoch = board_time.getEpoch();
+  int secondOfDay = 3600 * board_time.getHour(true) + 60 * board_time.getMinute() + board_time.getSecond();
 
   // decide what do to now (if wifi loop)
   if ((current_epoch - last_sync_time_epoch > SYNC_CLOCK_SEC) || (current_epoch < 1700000000)) {
@@ -133,7 +135,9 @@ void loop() {
     do_sync_clock = 1;
   }
 
-  if ((current_epoch - last_quick_loop_epoch > QUICK_LOOP_SEC) || (current_epoch < 1700000000)) {
+  if ((current_epoch - last_quick_loop_epoch > QUICK_LOOP_SEC) || (current_epoch < 1700000000) || (secondOfDay < QUICK_LOOP_SEC)) {
+    // druha cast == vim, ze cas je urcite blbe
+    // treti cast == hned po pulnoci
     Serial.println("want to quick loop");
     last_quick_loop_epoch = current_epoch;
     do_anything = 1;
@@ -150,7 +154,9 @@ void loop() {
   //executivni cast - jen jednou kvuli wifi
 
   Serial.println("----");
-  Serial.println(actual_time);
+  Serial.print(actual_time);
+  Serial.print(" --> epoch:");
+  Serial.println(current_epoch);
 
   if (do_anything == 1) {
     drawBox(470, 310, 10, 10, TFT_RED);
@@ -217,7 +223,10 @@ void loop() {
           String full_path_trend_icon = "/meteo/trend/" + String(md.trend_icon) + "_40.raw";
           drawPic(ICON_TREND_x, ICON_TREND_y, ICON_TREND_width, ICON_TREND_height, full_path_trend_icon);
 
-          int dneskaDoW = board_time.getDayofWeek();
+
+          int dneskaDoW = board_time.getTime("%w").toInt();
+
+
           int zitraDoW = dneskaDoW + 1;
           if (zitraDoW > 6)
             zitraDoW = zitraDoW - 7;
@@ -272,5 +281,6 @@ void loop() {
   }
 
 
+  // pockam vterinu nez vsechno zopakuji
   delay(1000);
 }

@@ -46,6 +46,7 @@ meteo_data update_meteo() {
 
 
   if (httpResponseCode == 200) {
+    Serial.println("meteo query ok");
     String payload = http.getString();
     DeserializationError error = deserializeJson(w_doc, payload);
 
@@ -121,9 +122,9 @@ meteo_data update_meteo() {
 
     for (int one_hour = 0; one_hour < 24; one_hour++) {
 
-     // Serial.println("----------------------------------");
-     // Serial.print("one hour:");
-     // Serial.println(one_hour);
+      // Serial.println("----------------------------------");
+      // Serial.print("one hour:");
+      // Serial.println(one_hour);
 
       unsigned long one_start_epoch = current_epoch + one_hour * 3600;
       unsigned long one_end_epoch = DELKA_PROGRAMU + one_start_epoch;
@@ -157,8 +158,8 @@ meteo_data update_meteo() {
               md.hdo2 = 0;
             } else {
               md.hdo2 = prev_hdo2_ok;
-             // Serial.print("beru:");
-             // Serial.println(prev_hdo2_ok);
+              // Serial.print("beru:");
+              // Serial.println(prev_hdo2_ok);
             }
           }
         }
@@ -170,14 +171,18 @@ meteo_data update_meteo() {
 
     //tohle tu nejak patri, ale uplne to promyslene nemam - pouzije se, kdyz je spravna ta posledni hodina
     if (md.hdo2 < 0)
-       md.hdo2 = prev_hdo2_ok;
+      md.hdo2 = prev_hdo2_ok;
 
     //Serial.println("<<<array");
 
 
     md.valid = true;
+    Serial.println("meteo updated");
+  } else {
+    Serial.print("meteo query returned:");
+    Serial.println(httpResponseCode);
   }
 
-  Serial.println("meteo updated");
+
   return md;
 }

@@ -159,7 +159,8 @@ void loop() {
   Serial.println(current_epoch);
 
   if (do_anything == 1) {
-    drawBox(470, 310, 10, 10, TFT_RED);
+    drawBox(470, 310, 10, 10, TFT_BLUE);
+    int vysledek_behu = 0;
 
     if (wifi_connect() == 0) {  //wifi ok
 
@@ -274,10 +275,19 @@ void loop() {
           //Serial.println(full_path_trend_icon);
         }
       }
-
+      vysledek_behu = 1;
       wifi_disconnect();
+    } else {
+      // wifi se nepovedlo
+      // ale kaslu na opravu, pockam dalsi cyklus
+      vysledek_behu = 2;
     }
-    drawBox(470, 310, 10, 10, TFT_WHITE);
+    if (vysledek_behu == 1)
+      drawBox(470, 310, 10, 10, TFT_WHITE);
+    else if (vysledek_behu == 2)
+      drawBox(470, 310, 10, 10, TFT_RED); //necham varovani, ze posledni aktualizace nebyla ok
+    else
+      drawBox(470, 310, 10, 10, TFT_BLACK);  //snad nemuze nastatat
   }
 
 

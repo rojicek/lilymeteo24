@@ -25,5 +25,7 @@ struct meteo_data{
 };
 
 meteo_data update_meteo();
+void update_all_elements(meteo_data md);
+void kresli_info_ctverecek(int vysledek_behu);
 
 #endif

@@ -23,13 +23,13 @@ int sdcard_begin() {
 
 
 // Function that gets current epoch time
-void sync_local_clock() {
-  
-  const char *ntpServer = "pool.ntp.org";
+int sync_local_clock() {
+
+  const char* ntpServer = "pool.ntp.org";
   const long gmtOffset_sec = 3600;
   const int daylightOffset_sec = 3600;
 
-  ESP32Time board_time(0); 
+  ESP32Time board_time(0);
 
   //sync with NTP
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
@@ -39,7 +39,7 @@ void sync_local_clock() {
   int count = 10;  //how many tries
   while (count > 0) {
     if (getLocalTime(&timeinfo)) {
-      count = -1;
+      count = -2;
       Serial.println("NTP time syncd");
     } else {
       count--;  //try again
@@ -50,7 +50,9 @@ void sync_local_clock() {
   time(&now);
 
   board_time.setTime(now);
-  
-  return;
-}
 
+  if (count == -2)
+    return 0; //ok
+  else
+    return 1; //chyba
+}

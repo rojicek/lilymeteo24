@@ -155,5 +155,22 @@ void loop() {
   }
 
   // pockam vterinu nez vsechno zopakuji
+
   delay(1000);
+
+  int wait_loop = 10;
+  int16_t touch_x, touch_y;
+  while (wait_loop > 0) {
+    // wait for push button
+    if (ttgo->getTouch(touch_x, touch_y) == 1)
+    {
+      int new_screen = touch_screen_info(touch_x, touch_y);      
+      Serial.println(new_screen);      
+      Serial.println("oooooooooooo");
+    }
+
+    wait_loop--;
+    delay(100);  //10*100ms = 1s cekani
+
+  }  //while wait loop
 }

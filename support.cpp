@@ -52,7 +52,18 @@ int sync_local_clock() {
   board_time.setTime(now);
 
   if (count == -2)
-    return 0; //ok
+    return 0;  //ok
   else
-    return 1; //chyba
+    return 1;  //chyba
+}
+
+int touch_screen_info(int16_t x, int16_t y) {
+  if (x < 240)
+    return 1;  //daily weather
+  else {
+    if (y < 170)
+      return 2;  // cycling info
+    else
+      return 3;  //HDO
+  }
 }

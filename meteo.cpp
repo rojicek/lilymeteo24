@@ -37,7 +37,7 @@
 #define TXT_OAT_y 215
 
 #define TXT_TREND_TEMP_x 113
-#define TXT_TREND_TEMP_y 269
+#define TXT_TREND_TEMP_y 270
 
 #define ICON_TREND_x 63
 #define ICON_TREND_y 264
@@ -107,7 +107,7 @@ meteo_data update_meteo() {
     }
 
     md.oat = w_doc["weather"]["temp"];
-    //md.oat = random(-11,14); // testovani
+    //  md.oat = (int)random(-15, 35);  // debug
 
     time_t sunrise = w_doc["weather"]["sunrise"];
     struct tm sunrise_local = *localtime(&sunrise);
@@ -139,6 +139,8 @@ meteo_data update_meteo() {
     strcpy(md.trend_icon, w_doc["weather"]["temp_trend_icon"]);
 
     md.trend_temp = w_doc["weather"]["temp_trend"];
+    //debug!!
+    //md.trend_temp = (int)random(-12, 12);
 
     md.clc_tdy = w_doc["weather"]["clc_tdy"];
     md.clc_tmr = w_doc["weather"]["clc_tmr"];
@@ -230,6 +232,7 @@ meteo_data update_meteo() {
   } else {
     Serial.print("meteo query returned:");
     Serial.println(httpResponseCode);
+    md.valid = false;
   }
 
 
@@ -281,7 +284,11 @@ void update_all_elements(meteo_data md) {
   shown_past_shift_x = x_shift;
 
   String actual_trend_temp("");
-  actual_trend_temp = String(md.trend_temp) + "°C";
+  if (md.trend_temp > 0)
+    actual_trend_temp = "+";
+  else
+    actual_trend_temp = "";  //minus je v cisle
+  actual_trend_temp = actual_trend_temp + String(md.trend_temp) + "°C";
   show_text(TXT_TREND_TEMP_x, TXT_TREND_TEMP_x, TXT_TREND_TEMP_y, ubuntu_regular_30, shown_trend_temp, actual_trend_temp);
   shown_trend_temp = actual_trend_temp;
 
@@ -297,8 +304,8 @@ void update_all_elements(meteo_data md) {
   if (zitraDoW > 6)
     zitraDoW = zitraDoW - 7;
 
-  String dneska = day_of_week[dneskaDoW];
-  String zitra = day_of_week[zitraDoW];
+  String dneska = String(day_of_week[dneskaDoW]);
+  String zitra = String(day_of_week[zitraDoW]);
 
 
   show_text(280, 280, 80, ubuntu_regular_23, shown_today, dneska);
@@ -344,11 +351,9 @@ void update_all_elements(meteo_data md) {
 
 void kresli_info_ctverecek(int vysledek_behu) {
   // kreslim info ctverecek
-  if (vysledek_behu == 0)
-  {
+  if (vysledek_behu == 0) {
     //do nothing ... ale musi to tu byt abych neskoncil s 'jinou' chybou
-  }
-  else if (vysledek_behu == 1)
+  } else if (vysledek_behu == 1)
     drawBox(470, 310, 10, 10, TFT_MAGENTA);  //necham varovani, ze posledni aktualizace nebyla ok
   else if (vysledek_behu == 2)
     drawBox(470, 310, 10, 10, TFT_RED);  //necham varovani, ze wifi nebylo ok

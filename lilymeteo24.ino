@@ -22,7 +22,7 @@ TTGOClass* ttgo;
 // jak casto sync hodiny s ntp (12 hodin nebo tak nejak)
 #define SYNC_CLOCK_SEC 40000
 // jak casto se nacte meteo (3 min)
-#define QUICK_LOOP_SEC 180
+#define QUICK_LOOP_SEC 180 //180
 
 #define TXT_TIME_x 280
 #define TXT_TIME_y 10
@@ -110,13 +110,14 @@ void loop() {
   //////////////////////////////
   //executivni cast - jen jednou kvuli wifi
 
-  Serial.println("----");
-  Serial.print(actual_time);
+ // Serial.println("----");
+ // Serial.print(actual_time);
   Serial.print(" --> epoch:");
   Serial.println(current_epoch);
 
   if (do_anything == 1) {
     drawBox(470, 310, 10, 10, TFT_BLUE);
+
     int vysledek_meteo_behu = 0;
     int vysledek_ntp_behu = 0;
 
@@ -158,7 +159,7 @@ void loop() {
 
   delay(1000);
 
-  int wait_loop = 10;
+  int wait_loop = 5;
   int16_t touch_x, touch_y;
   while (wait_loop > 0) {
     // wait for push button
@@ -170,7 +171,7 @@ void loop() {
     }
 
     wait_loop--;
-    delay(100);  //10*100ms = 1s cekani
+    delay(80);  //10*100ms = 1s cekani
 
   }  //while wait loop
 }

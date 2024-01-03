@@ -14,10 +14,10 @@ void show_text(int past_x, int x, int y, const unsigned char* font, String shown
     ttgo->tft->loadFont(font);
     ttgo->tft->setTextColor(TFT_WHITE);
     ttgo->tft->setCursor(past_x, y);
-    ttgo->tft->print(shown);
+    ttgo->tft->print(shown); //delete old
     ttgo->tft->setTextColor(TFT_BLACK);
     ttgo->tft->setCursor(x, y);
-    ttgo->tft->print(actual);
+    ttgo->tft->print(actual); //print new
   }
   return;
 }

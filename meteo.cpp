@@ -45,7 +45,6 @@
 #define ICON_TREND_height 40
 
 // XX je cokoliv co nenastane
-//String shown_time("XX");
 String shown_sunrise("XX");
 String shown_sunset("XX");
 String shown_oat("XX");
@@ -105,6 +104,7 @@ meteo_data update_meteo() {
       md.valid = false;
       return md;
     }
+
 
     md.oat = w_doc["weather"]["temp"];
     //  md.oat = (int)random(-15, 35);  // debug
@@ -239,7 +239,20 @@ meteo_data update_meteo() {
   return md;
 }
 
-void update_all_elements(meteo_data md) {
+void update_all_elements(meteo_data md, int prazdna_obrazovka) {
+
+   if (prazdna_obrazovka == 1) {
+      // 
+      shown_sunrise = "XX";
+      shown_sunset = "XX";
+      shown_oat = "XX";
+      shown_trend_temp = "XX";
+      shown_tomorrow = "XX";
+      shown_today = "xx";
+      shown_hdo = "xx";
+      shown_past_shift_x = 0;
+    }
+    
 
   ESP32Time board_time(0);
   String actual_sunrise = md.sunrise;

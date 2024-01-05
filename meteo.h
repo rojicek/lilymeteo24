@@ -3,7 +3,7 @@
 
 #include "config.h"
 
-struct meteo_data{
+struct meteo_data {
   bool valid;
   int oat;
   char sunrise[6];
@@ -21,11 +21,10 @@ struct meteo_data{
 
   int hdo1;
   int hdo2;
-
 };
 
 meteo_data update_meteo();
-void update_all_elements(meteo_data md);
+void update_all_elements(meteo_data md, int prazdna_obrazovka);
 void kresli_info_ctverecek(int vysledek_behu);
 
 #endif

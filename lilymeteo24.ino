@@ -15,6 +15,7 @@ SPIClass* sdhander = nullptr;
 #include "show_elements.h"
 #include "meteo.h"
 #include "ubuntu_fonts.h"
+#include "hourly_temp_screen.h"
 
 
 TTGOClass* ttgo;
@@ -22,7 +23,7 @@ TTGOClass* ttgo;
 // jak casto sync hodiny s ntp (12 hodin nebo tak nejak)
 #define SYNC_CLOCK_SEC 40000
 // jak casto se nacte meteo (3 min)
-#define QUICK_LOOP_SEC 180 //180
+#define QUICK_LOOP_SEC 180  //180
 
 #define TXT_TIME_x 280
 #define TXT_TIME_y 10
@@ -74,6 +75,7 @@ void loop() {
   int do_anything = 0;
   int do_sync_clock = 0;
   int do_quick_loop = 0;
+  int vsechno_prepis = 1;
 
   ESP32Time board_time(0);
   meteo_data md;
@@ -110,8 +112,8 @@ void loop() {
   //////////////////////////////
   //executivni cast - jen jednou kvuli wifi
 
- // Serial.println("----");
- // Serial.print(actual_time);
+  // Serial.println("----");
+  // Serial.print(actual_time);
   Serial.print(" --> epoch:");
   Serial.println(current_epoch);
 
@@ -132,7 +134,8 @@ void loop() {
         Serial.println("do quick loop");
         md = update_meteo();
         if (md.valid == true) {
-          update_all_elements(md);
+          update_all_elements(md, vsechno_prepis);
+          vsechno_prepis = 0;
           // vysledek_meteo_behu necham 0
         } else {
           vysledek_meteo_behu = 1;
@@ -163,11 +166,18 @@ void loop() {
   int16_t touch_x, touch_y;
   while (wait_loop > 0) {
     // wait for push button
-    if (ttgo->getTouch(touch_x, touch_y) == 1)
-    {
-      int new_screen = touch_screen_info(touch_x, touch_y);      
-      Serial.println(new_screen);      
-      Serial.println("oooooooooooo");
+    if (ttgo->getTouch(touch_x, touch_y) == 1) {
+      int new_screen = touch_screen_info(touch_x, touch_y);
+
+      Serial.print("new screen id:");
+      Serial.println(new_screen);
+
+      if (new_screen == 1) {
+        show_hourly_temp_screen();
+        last_quick_loop_epoch = 0;  //enforce refresh
+        vsechno_prepis = 1;
+        shown_time = ".";
+      }
     }
 
     wait_loop--;

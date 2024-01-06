@@ -239,9 +239,9 @@ meteo_data update_meteo() {
   return md;
 }
 
-void update_all_elements(meteo_data md, int prazdna_obrazovka) {
+void update_all_elements(meteo_data md, int vsechno_prepis) {
 
-   if (prazdna_obrazovka == 1) {
+   if (vsechno_prepis == 1) {
       // 
       shown_sunrise = "XX";
       shown_sunset = "XX";

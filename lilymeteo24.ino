@@ -35,6 +35,7 @@ String shown_time("XX");
 // extra flag for sync time
 unsigned long last_sync_time_epoch = 0;
 unsigned long last_quick_loop_epoch = 0;
+int vsechno_prepis = -1;
 
 
 void setup() {
@@ -62,6 +63,9 @@ void setup() {
   else
     Serial.println(" failed!");
 
+  //asi je to poprve stejne jedno
+  vsechno_prepis = 1;
+
   delay(1000);  // nevim proc
   ttgo->tft->fillScreen(TFT_WHITE);
   Serial.println("setup hotov");
@@ -71,11 +75,10 @@ void loop() {
 
   ////////////////////
 
-
   int do_anything = 0;
   int do_sync_clock = 0;
   int do_quick_loop = 0;
-  int vsechno_prepis = 1;
+
 
   ESP32Time board_time(0);
   meteo_data md;
@@ -134,8 +137,11 @@ void loop() {
         Serial.println("do quick loop");
         md = update_meteo();
         if (md.valid == true) {
+          Serial.print("Vsechno prepis: ");
+          Serial.println(vsechno_prepis);
           update_all_elements(md, vsechno_prepis);
           vsechno_prepis = 0;
+
           // vysledek_meteo_behu necham 0
         } else {
           vysledek_meteo_behu = 1;
@@ -158,9 +164,8 @@ void loop() {
     kresli_info_ctverecek(vysledek_meteo_behu);
   }
 
-  // pockam vterinu nez vsechno zopakuji
-
-  delay(1000);
+  // pockam chvili nez vsechno zopakuji
+  delay(100);
 
   int wait_loop = 5;
   int16_t touch_x, touch_y;
@@ -176,12 +181,13 @@ void loop() {
         show_hourly_temp_screen();
         last_quick_loop_epoch = 0;  //enforce refresh
         vsechno_prepis = 1;
-        shown_time = ".";
+        shown_time = "."; // prepis i cas
+        //Serial.println("PREPSANO");
       }
     }
 
     wait_loop--;
-    delay(80);  //10*100ms = 1s cekani
+    delay(80);  
 
   }  //while wait loop
 }

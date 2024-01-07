@@ -11,6 +11,11 @@ void show_hourly_temp_screen() {
   Serial.println("showing hourly temperature screen");
 
   ttgo->tft->fillScreen(TFT_WHITE);
+  //ttgo->tft->drawLine(10, 10, 400, 300, TFT_RED);
+
+  //tlusta cara = 2 trojuhelniky
+   ttgo->tft->fillTriangle(10, 10, 400, 300, 10, 20, TFT_BLUE);
+   ttgo->tft->fillTriangle(10, 10, 400, 300, 400, 310, TFT_RED);
 
 
   /// cekam na konec

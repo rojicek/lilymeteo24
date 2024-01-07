@@ -35,6 +35,7 @@ String shown_time("XX");
 // extra flag for sync time
 unsigned long last_sync_time_epoch = 0;
 unsigned long last_quick_loop_epoch = 0;
+unsigned long last_touch_epoch = 0;
 int vsechno_prepis = -1;
 
 
@@ -73,6 +74,7 @@ void setup() {
 
 void loop() {
 
+
   ////////////////////
 
   int do_anything = 0;
@@ -87,6 +89,21 @@ void loop() {
   unsigned long current_epoch = board_time.getEpoch();
   int secondOfDay = 3600 * board_time.getHour(true) + 60 * board_time.getMinute() + board_time.getSecond();
 
+  if (ttgo->touched()) {
+    last_touch_epoch = current_epoch;
+  }
+
+  //decide jestli ma displej svitit
+  if ((secondOfDay > 1800) && (secondOfDay < 8 * 3600) && (current_epoch - last_touch_epoch > 60)) 
+  {
+    // v noci vypni displej ale musi to byt max 60s od posledniho dotyku
+    ttgo->setBrightness(0);
+    delay(100);
+    return;
+  }
+
+
+  ttgo->setBrightness(200);
 
   // decide what do to now (later in wifi loop)
   if ((current_epoch - last_sync_time_epoch > SYNC_CLOCK_SEC) || (current_epoch < 1700000000)) {
@@ -97,9 +114,9 @@ void loop() {
     do_sync_clock = 1;
   }
 
-  if ((current_epoch - last_quick_loop_epoch > QUICK_LOOP_SEC) || (current_epoch < 1700000000) || (secondOfDay < QUICK_LOOP_SEC)) {
+  if ((current_epoch - last_quick_loop_epoch > QUICK_LOOP_SEC) || (current_epoch < 1700000000) || ((secondOfDay > 5) && (secondOfDay < 25) && (current_epoch - last_quick_loop_epoch > 22))) {
     // druha cast == vim, ze cas je urcite blbe
-    // treti cast == hned po pulnoci
+    // treti cast == 5-30s po pulnoci, ale min 10s po poslednim updatu (aby to nejelo furt do kola) - tohle by melo zabrat 1x hned po pulnoc (pockaa 5s na update serveru)
     Serial.println("want to quick loop");
     last_quick_loop_epoch = current_epoch;
     do_anything = 1;
@@ -172,6 +189,7 @@ void loop() {
   while (wait_loop > 0) {
     // wait for push button
     if (ttgo->getTouch(touch_x, touch_y) == 1) {
+      //if (1 == 1) {
       int new_screen = touch_screen_info(touch_x, touch_y);
 
       Serial.print("new screen id:");
@@ -181,13 +199,13 @@ void loop() {
         show_hourly_temp_screen();
         last_quick_loop_epoch = 0;  //enforce refresh
         vsechno_prepis = 1;
-        shown_time = "."; // prepis i cas
+        shown_time = ".";  // prepis i cas
         //Serial.println("PREPSANO");
       }
     }
 
     wait_loop--;
-    delay(80);  
+    delay(80);
 
   }  //while wait loop
 }

@@ -80,3 +80,8 @@ void drawBox(int x, int y, int w, int h, uint16_t color) {
   }
 }
 
+void line (int x1, int y1, int x2, int y2, uint16_t color, int width)
+{
+  
+
+}

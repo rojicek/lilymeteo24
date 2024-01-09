@@ -159,12 +159,16 @@ meteo_data update_meteo() {
     //  Serial.print("*->");
 
     struct tm ranni_hdo;
-    time_t ranni_hdo_seconds = current_epoch + 86400;
+    // CHYBA - chci nejblizsi 9h rano
+    time_t ranni_hdo_seconds = current_epoch;  // + 86400;
+    
+    if (board_time.getHour(true) > RANNI_HDO_HODINA) //pokud uz je po 9 rano, tak dalsi bude az zitra - prictu den
+      current_epoch = current_epoch + 86400;
 
     memcpy(&ranni_hdo, localtime(&ranni_hdo_seconds), sizeof(struct tm));
-    ranni_hdo.tm_hour = RANNI_HDO_HODINA;
-    ranni_hdo.tm_min = 0;
-    ranni_hdo.tm_sec = 0;
+    ranni_hdo.tm_hour = RANNI_HDO_HODINA; // nastavim hodinu natvrdo
+    ranni_hdo.tm_min = 0; // smazu hodiny
+    ranni_hdo.tm_sec = 0; // a sekundy
 
     unsigned long ranni_hdo_epoch = mktime(&ranni_hdo);
     unsigned long time_from_ranni_hdo = 999999999;
@@ -241,18 +245,18 @@ meteo_data update_meteo() {
 
 void update_all_elements(meteo_data md, int vsechno_prepis) {
 
-   if (vsechno_prepis == 1) {
-      // 
-      shown_sunrise = "XX";
-      shown_sunset = "XX";
-      shown_oat = "XX";
-      shown_trend_temp = "XX";
-      shown_tomorrow = "XX";
-      shown_today = "xx";
-      shown_hdo = "xx";
-      shown_past_shift_x = 0;
-    }
-    
+  if (vsechno_prepis == 1) {
+    //
+    shown_sunrise = "XX";
+    shown_sunset = "XX";
+    shown_oat = "XX";
+    shown_trend_temp = "XX";
+    shown_tomorrow = "XX";
+    shown_today = "xx";
+    shown_hdo = "xx";
+    shown_past_shift_x = 0;
+  }
+
 
   ESP32Time board_time(0);
   String actual_sunrise = md.sunrise;
